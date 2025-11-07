@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Quiz - CyberQuiz{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0">Question</h2>
+            <span class="badge bg-secondary">{{ remaining }} restante(s)</span>
+          </div>
+          <p class="fs-5">{{ question['texte'] }}</p>
+          <p class="text-muted">Thème : {{ question['theme'] }} | Source : {{ question['source'] }}</p>
+          <form method="post" class="d-flex gap-2" id="quiz-form">
+            <input type="hidden" name="timeout" id="timeout-input" value="false">
+            <button class="btn btn-success flex-fill" name="answer" value="true" type="submit">Oui</button>
+            <button class="btn btn-danger flex-fill" name="answer" value="false" type="submit">Non</button>
+          </form>
+          {% if mode == 'chrono' %}
+            <div class="alert alert-warning mt-3 mb-0" role="alert">
+              Mode chrono activé : <span id="timer">30</span> secondes restantes.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  {% if mode == 'chrono' %}
+    <script>
+      let timeLeft = 30;
+      const timerElement = document.getElementById('timer');
+      const form = document.getElementById('quiz-form');
+      const timeoutInput = document.getElementById('timeout-input');
+
+      const countdown = setInterval(() => {
+        timeLeft -= 1;
+        timerElement.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          timeoutInput.value = 'true';
+          form.submit();
+        }
+      }, 1000);
+    </script>
+  {% endif %}
+{% endblock %}

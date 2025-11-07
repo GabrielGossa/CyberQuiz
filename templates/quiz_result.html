@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Résultat - CyberQuiz{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          {% if feedback[0] %}
+            <div class="alert alert-success">{{ feedback[1] }}</div>
+          {% else %}
+            <div class="alert alert-danger">{{ feedback[1] }}</div>
+          {% endif %}
+          <p class="fs-5">Question : {{ question['texte'] }}</p>
+          <p>Réponse correcte : <strong>{{ 'Oui' if question['reponse'] else 'Non' }}</strong></p>
+          <p class="mb-4">Score actuel : <strong>{{ score }}</strong></p>
+          {% if remaining > 0 %}
+            <a class="btn btn-primary" href="{{ url_for('quiz') }}">Question suivante ({{ remaining }} restante(s))</a>
+          {% else %}
+            <a class="btn btn-success" href="{{ url_for('quiz') }}">Voir le score final</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

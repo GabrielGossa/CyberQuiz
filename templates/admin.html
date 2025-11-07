@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Admin - CyberQuiz{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="h4 mb-4 text-center">Espace administrateur</h1>
+
+          {% if not is_admin %}
+            <form method="post" class="mx-auto" style="max-width: 320px;">
+              <div class="mb-3">
+                <label for="username" class="form-label">Identifiant</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+              </div>
+            </form>
+          {% else %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <form method="post" action="{{ url_for('admin_logout') }}">
+                <button class="btn btn-outline-secondary" type="submit">Se déconnecter</button>
+              </form>
+              <form method="post" action="{{ url_for('admin_generate') }}">
+                <button class="btn btn-success" type="submit">Générer de nouvelles questions</button>
+              </form>
+            </div>
+
+            <h2 class="h5 mt-4">Questions en attente de validation</h2>
+            {% if pending_questions %}
+              <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>ID</th>
+                      <th>Texte</th>
+                      <th>Réponse</th>
+                      <th>Thème</th>
+                      <th>Source</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for question in pending_questions %}
+                      <tr>
+                        <td>{{ question['id'] }}</td>
+                        <td>{{ question['texte'] }}</td>
+                        <td>{{ 'Oui' if question['reponse'] else 'Non' }}</td>
+                        <td>{{ question['theme'] }}</td>
+                        <td>{{ question['source'] }}</td>
+                        <td class="d-flex gap-2">
+                          <form method="post" action="{{ url_for('admin_question_action', question_id=question['id'], action='valider') }}">
+                            <button class="btn btn-success btn-sm" type="submit">✅ Valider</button>
+                          </form>
+                          <form method="post" action="{{ url_for('admin_question_action', question_id=question['id'], action='rejeter') }}">
+                            <button class="btn btn-danger btn-sm" type="submit">❌ Rejeter</button>
+                          </form>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted">Aucune question en attente pour le moment.</p>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
