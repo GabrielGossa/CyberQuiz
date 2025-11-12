@@ -22,13 +22,18 @@
               </div>
             </form>
           {% else %}
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
               <form method="post" action="{{ url_for('admin_logout') }}">
                 <button class="btn btn-outline-secondary" type="submit">Se déconnecter</button>
               </form>
-              <form method="post" action="{{ url_for('admin_generate') }}">
-                <button class="btn btn-success" type="submit">Générer de nouvelles questions</button>
-              </form>
+              <div class="d-flex flex-column flex-sm-row gap-2">
+                <form method="post" action="{{ url_for('admin_generate') }}">
+                  <button class="btn btn-success" type="submit">Générer de nouvelles questions</button>
+                </form>
+                <form method="post" action="{{ url_for('admin_delete_pending') }}" onsubmit="return confirm('Supprimer toutes les questions en attente ?');">
+                  <button class="btn btn-outline-danger" type="submit">🗑️ Supprimer toutes les questions en cours de validation</button>
+                </form>
+              </div>
             </div>
 
             <h2 class="h5 mt-4">Questions en attente de validation</h2>

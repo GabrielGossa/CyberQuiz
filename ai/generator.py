@@ -8,6 +8,7 @@ import sqlite3
 import urllib.error
 import urllib.request
 from datetime import datetime
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
 
@@ -173,22 +174,66 @@ def generate_questions() -> list[dict[str, str | bool]]:
     return generate_local_fallback()
 
 
-def save_questions(questions: list[dict[str, str | bool]]) -> None:
+def normalize(text: str) -> str:
+    """Return a normalized version of a question for duplicate comparison."""
+
+    return " ".join(text.strip().split()).casefold()
+
+
+def is_similar(candidate: str, existing: str, threshold: float = 0.9) -> bool:
+    """Return True when two strings are similar enough according to difflib."""
+
+    return SequenceMatcher(None, candidate, existing).ratio() >= threshold
+
+
+def save_questions(questions: list[dict[str, str | bool]]) -> dict[str, int]:
     """Insert the generated questions in the database with an 'en_attente' status."""
 
     conn = sqlite3.connect(DATABASE)
+    skipped = 0
+    inserted = 0
     try:
+        rows = conn.execute("SELECT texte FROM questions").fetchall()
+        known_texts = [row[0] for row in rows]
+        normalized_known = [normalize(text) for text in known_texts]
+
         for item in questions:
+            texte = item["texte"]
+            normalized_candidate = normalize(texte)
+
+            duplicate_found = False
+            for original, normalized in zip(known_texts, normalized_known):
+                if normalized_candidate == normalized:
+                    print(f"[DUPLICATE] Question déjà existante : {texte}")
+                    duplicate_found = True
+                    break
+                if is_similar(normalized_candidate, normalized):
+                    print(
+                        "[DUPLICATE] Question similaire ignorée : "
+                        f"{texte} (proche de : {original})"
+                    )
+                    duplicate_found = True
+                    break
+
+            if duplicate_found:
+                skipped += 1
+                continue
+
             conn.execute(
                 """
                 INSERT INTO questions (texte, reponse, theme, source, statut)
                 VALUES (?, ?, ?, ?, ?)
                 """,
-                (item["texte"], int(item["reponse"]), item["theme"], item["source"], "en_attente"),
+                (texte, int(item["reponse"]), item["theme"], item["source"], "en_attente"),
             )
+            known_texts.append(texte)
+            normalized_known.append(normalized_candidate)
+            inserted += 1
         conn.commit()
     finally:
         conn.close()
+
+    return {"inserted": inserted, "skipped": skipped}
 
 
 def main() -> None:
@@ -196,11 +241,13 @@ def main() -> None:
 
     DATABASE.touch(exist_ok=True)
     questions = generate_questions()
-    save_questions(questions)
+    result = save_questions(questions)
     payload = {
         "generated_at": datetime.utcnow().isoformat(),
         "count": len(questions),
         "questions": questions,
+        "inserted": result["inserted"],
+        "skipped_duplicates": result["skipped"],
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
 

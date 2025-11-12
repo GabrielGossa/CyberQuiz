@@ -82,6 +82,39 @@ le script utilise automatiquement un jeu de questions local.
 
 Les questions générées sont insérées avec le statut `en_attente`. Validez-les via l'interface admin pour les rendre jouables.
 
+### 🔍 Gestion des doublons
+
+Le générateur vérifie automatiquement les affirmations proposées avant de les insérer :
+
+- comparaison textuelle stricte (après normalisation de la casse et des espaces) ;
+- comparaison sémantique simple basée sur la similarité de `difflib.SequenceMatcher`.
+
+Si un doublon est détecté, la question est ignorée et un message est affiché dans la console, par exemple :
+
+```
+[DUPLICATE] Question déjà existante : Les mises à jour logicielles corrigent souvent des failles de sécurité critiques.
+```
+
+### 🗑️ Suppression de la liste de validation
+
+Depuis l'interface administrateur, le bouton « 🗑️ Supprimer toutes les questions en cours de validation » permet de vider d'un seul clic la liste des affirmations avec le statut `en_attente`. Les questions déjà validées ainsi que les scores enregistrés ne sont pas affectés.
+
+### 🧩 Interaction avec la base SQLite
+
+La base de données SQLite `cyberquiz.db` peut être explorée via le terminal :
+
+```bash
+sqlite3 cyberquiz.db
+```
+
+Quelques commandes utiles une fois dans la console `sqlite3` :
+
+```sql
+.tables            -- liste les tables disponibles
+SELECT * FROM questions LIMIT 5;  -- apercu des questions
+SELECT * FROM scores ORDER BY score DESC LIMIT 10;  -- top 10 des scores
+```
+
 ## Structure du projet
 
 ```

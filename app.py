@@ -328,6 +328,18 @@ def admin_generate():
     return redirect(url_for("admin"))
 
 
+@app.post("/admin/pending/delete")
+def admin_delete_pending():
+    """Remove every question that is still waiting for validation."""
+
+    require_admin()
+    db = get_db()
+    db.execute("DELETE FROM questions WHERE statut = ?", ("en_attente",))
+    db.commit()
+    flash("La liste des questions en attente a été vidée.", "info")
+    return redirect(url_for("admin"))
+
+
 # --------------------------------------------------------------------------------------
 # Application entry point
 # --------------------------------------------------------------------------------------
