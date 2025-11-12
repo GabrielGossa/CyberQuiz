@@ -6,6 +6,7 @@ Application web Flask permettant de tester ses connaissances en cybersécurité 
 
 - Python 3.11+
 - pip
+- (Optionnel) [Ollama](https://ollama.com/) avec le modèle `llama3` téléchargé pour générer les questions automatiquement
 - (Optionnel) Docker et Docker Compose
 
 ## Installation locale
@@ -28,6 +29,22 @@ Application web Flask permettant de tester ses connaissances en cybersécurité 
    flask --app app run
    ```
 5. Ouvrez votre navigateur sur http://127.0.0.1:5000.
+
+### Activer la génération de questions via Ollama
+
+1. Installez Ollama puis téléchargez le modèle `llama3` :
+   ```bash
+   ollama pull llama3
+   ```
+2. Lancez le serveur Ollama en local (il écoute par défaut sur `http://localhost:11434`).
+3. Facultatif : définissez des variables d'environnement pour personnaliser la connexion :
+   ```bash
+   export OLLAMA_URL="http://localhost:11434"
+   export OLLAMA_MODEL="llama3"
+   ```
+4. Depuis l'interface admin, utilisez le bouton « Générer de nouvelles questions ».
+
+Si Ollama n'est pas disponible, l'application basculera automatiquement sur un jeu de questions locales prédéfinies.
 
 ## Utilisation
 
@@ -55,10 +72,14 @@ docker-compose up --build
 
 ## Génération de questions IA
 
-Le script `ai/generator.py` simule une IA locale. Exécutez-le manuellement si besoin :
+Le script `ai/generator.py` contacte Ollama pour générer de nouvelles affirmations Oui/Non.
+Exécutez-le manuellement si besoin :
 ```bash
 python ai/generator.py
 ```
+Assurez-vous qu'Ollama est lancé et que le modèle `llama3` est disponible. En cas d'indisponibilité,
+le script utilise automatiquement un jeu de questions local.
+
 Les questions générées sont insérées avec le statut `en_attente`. Validez-les via l'interface admin pour les rendre jouables.
 
 ## Structure du projet
