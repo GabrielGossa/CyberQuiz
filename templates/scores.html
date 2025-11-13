@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Scores - CyberQuiz{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="h4 mb-4 text-center">Top 10 des scores</h1>
+          {% if scores %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Rang</th>
+                    <th>Pseudo</th>
+                    <th>Score</th>
+                    <th>Mode</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in scores %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <td>{{ row['pseudo'] }}</td>
+                      <td>{{ row['score'] }}</td>
+                      <td>{{ row['mode'].capitalize() }}</td>
+                      <td>{{ row['date'] }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-center">Aucun score enregistré pour le moment.</p>
+          {% endif %}
+          <div class="text-center mt-4">
+            <a class="btn btn-primary" href="{{ url_for('index') }}">Rejouer</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
