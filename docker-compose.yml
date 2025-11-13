@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - CYBERQUIZ_SECRET=change-me
+    command: ["flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "5000"]
