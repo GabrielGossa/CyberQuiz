@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Accueil - CyberQuiz{% endblock %}
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h1 class="h3 mb-4 text-center">Lancez votre CyberQuiz</h1>
+          <form method="post" novalidate>
+            <div class="mb-3">
+              <label for="pseudo" class="form-label">Pseudo</label>
+              <input type="text" class="form-control" id="pseudo" name="pseudo" required>
+              <div class="form-text">Doit être unique, choisissez un pseudo mémorable !</div>
+            </div>
+            <div class="mb-3">
+              <label for="mode" class="form-label">Mode de jeu</label>
+              <select class="form-select" id="mode" name="mode" required>
+                <option value="classique" selected>Classique - toutes les questions</option>
+                <option value="theme">Par thème</option>
+                <option value="chrono">Chrono (30 secondes par question)</option>
+              </select>
+            </div>
+            <div class="mb-3" id="theme-wrapper" style="display: none;">
+              <label for="theme" class="form-label">Choisissez un thème</label>
+              <select class="form-select" id="theme" name="theme">
+                <option value="">-- Choisir --</option>
+                {% for row in themes %}
+                  <option value="{{ row['theme'] }}">{{ row['theme'] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Commencer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script>
+    const modeSelect = document.getElementById('mode');
+    const themeWrapper = document.getElementById('theme-wrapper');
+
+    function toggleTheme() {
+      themeWrapper.style.display = modeSelect.value === 'theme' ? 'block' : 'none';
+    }
+
+    modeSelect.addEventListener('change', toggleTheme);
+    toggleTheme();
+  </script>
+{% endblock %}
